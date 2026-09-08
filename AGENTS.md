@@ -11,7 +11,8 @@
 
 ## 目录结构
 
-- `index.html`：页面结构。
+- `index.html`：网页入口，跳转到含 83 张背景的双栏页面。
+- `legacy.html`：保留的早期单栏页面。
 - `styles.css`：页面样式和响应式规则。
 - `app.js`：文案解析、场景分配、Canvas 合成、预览和 ZIP 导出。
 - `prototypes/scene-usage.mjs`：原型的筛选、分配和记录校验纯逻辑。
