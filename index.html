@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23171815'/%3E%3Crect x='9' y='14' width='46' height='27' fill='white'/%3E%3Cpath d='M21 51h22' stroke='%23d94a3a' stroke-width='5'/%3E%3C/svg%3E">
+  <title>课堂通知批量制作台</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <aside id="protocol-notice" class="protocol-notice" hidden>
+    <strong>当前是直接打开的预览页，识别和下载不会运行。</strong>
+    <span>请关闭本页，双击文件夹里的 start.command 启动工具。</span>
+  </aside>
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">独立本地工具</p>
+      <h1>课堂通知<br><span>批量制作台</span></h1>
+    </div>
+    <div class="batch-meter" aria-live="polite">
+      <strong id="notice-count">0</strong>
+      <span>条待生成</span>
+      <small>最多 20 条</small>
+    </div>
+  </header>
+
+  <main>
+    <section class="workbench" aria-labelledby="input-heading">
+      <div class="panel-heading">
+        <div>
+          <p class="step-mark">01 / 粘贴文案</p>
+          <h2 id="input-heading">粘贴一批，自动拆成每张图</h2>
+        </div>
+        <button id="example-button" class="text-button" type="button">填入10条示例</button>
+      </div>
+
+      <div class="input-title-row">
+        <label class="input-label" for="notice-input">通知文案</label>
+        <fieldset class="parse-modes" aria-label="文案拆分方式">
+          <legend>文案拆分方式</legend>
+          <label><input type="radio" name="parse-mode" value="smart" checked><span>智能识别</span></label>
+          <label><input type="radio" name="parse-mode" value="line"><span>每行一条</span></label>
+          <label><input type="radio" name="parse-mode" value="paragraph"><span>整段一条</span></label>
+        </fieldset>
+      </div>
+      <textarea id="notice-input" rows="10" spellcheck="false" placeholder="可直接粘贴一句、一行一条、带编号列表，或 Markdown 文档。&#10;&#10;例如：&#10;## 通知1&#10;18号同学&#10;请于课间到办公室&#10;&#10;## 通知2&#10;今天下午第二节调整为班会课"></textarea>
+
+      <section class="split-preview" aria-labelledby="split-heading">
+        <div class="split-toolbar">
+          <div>
+            <p class="step-mark">拆分预览</p>
+            <h3 id="split-heading">先核对，再生成</h3>
+            <p id="input-message">粘贴后会自动显示拆分结果</p>
+          </div>
+          <div class="split-actions">
+            <button id="reparse-button" class="quiet-button" type="button" disabled>重新识别</button>
+            <button id="add-draft-button" class="quiet-button" type="button">＋ 添加一条</button>
+          </div>
+        </div>
+        <div id="draft-empty" class="draft-empty">尚无内容。只输入“18号同学”，也会识别为一条。</div>
+        <div id="draft-list" class="draft-list" hidden></div>
+      </section>
+
+      <div class="input-footer">
+        <p>生成时以拆分预览里的文字为准</p>
+        <button id="generate-button" class="primary-button" type="button" disabled>
+          用预览内容生成
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="scene-strip" aria-labelledby="scene-heading">
+      <div class="strip-copy">
+        <p class="step-mark">02 / 场景胶卷</p>
+        <h2 id="scene-heading">10个场景，每轮不重复</h2>
+        <p>超过10条时会重新洗牌，不让相邻两张使用同一课堂。</p>
+      </div>
+      <div id="scene-reel" class="scene-reel" aria-label="内置课堂场景"></div>
+    </section>
+
+    <section class="results-section" aria-labelledby="results-heading">
+      <div class="results-bar">
+        <div>
+          <p class="step-mark">03 / 检查与下载</p>
+          <h2 id="results-heading">批量结果</h2>
+          <p id="result-summary" class="result-summary">粘贴文案后，这里会显示每张封面。</p>
+        </div>
+        <div class="result-actions">
+          <button id="reshuffle-button" class="secondary-button" type="button" disabled>重新分配场景</button>
+          <button id="download-all-button" class="primary-button" type="button" disabled>下载选中 ZIP</button>
+        </div>
+      </div>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-screen" aria-hidden="true"><span></span></div>
+        <p>等待第一批通知</p>
+        <small>文字、合成和打包都在本机完成</small>
+      </div>
+      <div id="results-grid" class="results-grid" hidden></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script>
+    if (window.location.protocol === "file:") {
+      document.querySelector("#protocol-notice").hidden = false;
+    }
+  </script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

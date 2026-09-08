@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>课堂通知制作台 · 双栏原型</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='white'/%3E%3Crect x='8' y='12' width='48' height='32' fill='%231e5b43'/%3E%3Cpath d='M18 53h28' stroke='%23df5144' stroke-width='5'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --ink: #171a18;
+      --muted: #69716c;
+      --line: #dfe3df;
+      --soft: #f5f7f5;
+      --green: #1e5b43;
+      --green-soft: #e9f2ed;
+      --red: #df5144;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      min-width: 0;
+      color: var(--ink);
+      background: var(--white);
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    button, textarea, input { font: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 76px;
+      padding: 0 44px;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 8px;
+      height: 38px;
+      background: var(--red);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: "Songti SC", "STSong", serif;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+
+    .counter {
+      padding-right: 16px;
+      color: var(--muted);
+      border-right: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .counter strong {
+      margin-right: 5px;
+      color: var(--red);
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 23px;
+    }
+
+    .button {
+      min-height: 40px;
+      padding: 0 17px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #aeb5b0;
+      font-weight: 700;
+    }
+
+    .button.primary {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.38;
+    }
+
+    main { padding: 32px 44px 72px; }
+
+    .workflow-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .workflow-label span {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      font-family: ui-monospace, Menlo, monospace;
+      letter-spacing: 0;
+    }
+
+    .work-area {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
+      min-height: 670px;
+      border: 1px solid var(--line);
+    }
+
+    .source-panel, .pages-panel { min-width: 0; }
+
+    .source-panel {
+      display: flex;
+      flex-direction: column;
+      padding: 26px;
+      border-right: 1px solid var(--line);
+    }
+
+    .pages-panel {
+      padding: 26px;
+      background: var(--soft);
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-family: "Songti SC", "STSong", serif;
+      font-size: 26px;
+    }
+
+    .panel-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 8px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .panel-step b {
+      display: grid;
+      width: 20px;
+      height: 20px;
+      place-items: center;
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      font-family: ui-monospace, Menlo, monospace;
+    }
+
+    .panel-head p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mode {
+      display: flex;
+      padding: 3px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .mode span {
+      padding: 7px 11px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mode .active { color: #fff; background: var(--green); }
+
+    .source-copy {
+      flex: 1;
+      width: 100%;
+      min-height: 510px;
+      padding: 20px;
+      resize: none;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #bcc3be;
+      outline: none;
+      font-size: 16px;
+      line-height: 2;
+      white-space: pre-wrap;
+    }
+
+    .source-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .recognition-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .recognition-state::before {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .recognition-state.waiting { color: #9b6a19; }
+    .recognition-state.waiting::before { background: #c98b22; }
+    .recognition-state.empty { color: var(--muted); }
+    .recognition-state.empty::before { background: #b6bcb8; }
+
+    .page-list {
+      display: grid;
+      gap: 12px;
+      max-height: 580px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .panel-empty {
+      display: grid;
+      min-height: 470px;
+      padding: 40px;
+      place-items: center;
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed #bbc2bd;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .page-item {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .page-number {
+      padding-top: 17px;
+      color: var(--red);
+      background: #f4eee9;
+      text-align: center;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .page-fields { padding: 14px; }
+
+    .item-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 11px;
+    }
+
+    .item-tools span {
+      color: var(--green);
+      background: var(--green-soft);
+      padding: 4px 7px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .item-tools div { display: flex; gap: 12px; }
+
+    .item-tools button {
+      padding: 0;
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid currentColor;
+      font-size: 11px;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: 68px minmax(0, 1fr);
+      align-items: start;
+      gap: 10px;
+      margin-top: 9px;
+    }
+
+    .field label {
+      padding-top: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .field textarea, .field input {
+      width: 100%;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #c9cec9;
+      border-radius: 0;
+      font-size: 13px;
+    }
+
+    .field textarea {
+      min-height: 66px;
+      padding: 9px 10px;
+      resize: none;
+      line-height: 1.65;
+    }
+
+    .field input { height: 36px; padding: 0 10px; }
+
+    .preview-section {
+      margin-top: 38px;
+      padding-top: 30px;
+      border-top: 1px solid var(--ink);
+    }
+
+    .preview-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .preview-head h2 {
+      margin: 0;
+      font-family: "Songti SC", "STSong", serif;
+      font-size: 32px;
+    }
+
+    .preview-head p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+      align-items: start;
+    }
+
+    .cover-card { border: 1px solid var(--line); background: #fff; }
+
+    .cover-stage {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: #eee;
+    }
+
+    .cover-stage > img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .screen-copy {
+      position: absolute;
+      left: var(--screen-left, 11.8%);
+      top: var(--screen-top, 27.55%);
+      display: grid;
+      width: var(--screen-width, 76.75%);
+      height: var(--screen-height, 31.7%);
+      padding: 5%;
+      place-items: center;
+      color: #111;
+      background: #fff;
+      text-align: center;
+      font-size: clamp(22px, 2.3vw, 40px);
+      font-weight: 900;
+      line-height: 1.38;
+    }
+
+    .cover-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 15px 17px;
+      border-top: 1px solid var(--line);
+    }
+
+    .cover-caption strong { display: block; font-size: 14px; }
+    .cover-caption span { color: var(--muted); font-size: 11px; }
+
+    .caption-actions { display: flex; gap: 8px; }
+    .caption-actions button { min-height: 34px; padding: 0 12px; background: #fff; border: 1px solid #afb5b0; font-size: 12px; font-weight: 700; }
+    .caption-actions .download { color: #fff; background: var(--green); border-color: var(--green); }
+
+    .prototype-note {
+      margin: 28px 0 0;
+      padding: 14px 16px;
+      color: var(--muted);
+      background: var(--soft);
+      border-left: 4px solid var(--red);
+      font-size: 13px;
+    }
+
+    .sync-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 9px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .sync-note.waiting { color: #9b6a19; }
+
+    .preview-empty {
+      display: grid;
+      min-height: 340px;
+      place-items: center;
+      color: var(--muted);
+      background: var(--soft);
+      border: 1px dashed #bbc2bd;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .flash {
+      animation: flash 650ms ease;
+    }
+
+    @keyframes flash {
+      0% { box-shadow: 0 0 0 0 rgba(30, 91, 67, 0.28); }
+      100% { box-shadow: 0 0 0 12px rgba(30, 91, 67, 0); }
+    }
+    .usage-panel {margin:30px 0;padding:22px;border:1px solid var(--line);background:#fff;}
+    .usage-panel select {padding:10px;font:inherit;margin:8px;}
+    .usage-panel p {font-size:13px;color:#63706b;}
+    #usage-scenes {display:flex;gap:12px;overflow:auto;padding:12px 0;}
+    .usage-scene {flex:0 0 130px;font-size:12px;}
+    .usage-scene img {width:130px;height:174px;object-fit:cover;display:block;margin-bottom:6px;}
+    .cover-caption {flex-wrap:wrap;}
+    .cover-caption b {font-size:12px;color:var(--green);}
+    @media(max-width:760px){main{padding:16px !important;} .work-area{display:block !important;} .preview-grid{grid-template-columns:1fr !important;} .topbar{flex-wrap:wrap;} .usage-panel{padding:12px;} .usage-panel .button{margin-top:8px;} .page-item{grid-template-columns:30px 1fr;} }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <div>
+        <h1>课堂通知制作台</h1>
+        <p>粘贴原文 → 核对每页 → 生成清晰课堂图</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="counter"><strong id="recognized-count">0</strong>页已识别</div>
+      <button id="clear-button" class="button" type="button">清空重来</button>
+      <button id="update-layout-button" class="button primary" type="button" disabled>更新下方排版</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="work-area">
+      <div class="source-panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-step"><b>1</b> 粘贴原始内容</div>
+            <h2>粘贴全部内容</h2>
+            <p>不用手动对齐，表格、Markdown、编号内容都可以直接粘贴。</p>
+          </div>
+          <button id="recognize-button" class="button primary" type="button">智能识别 →</button>
+        </div>
+        <textarea id="source-copy" class="source-copy" spellcheck="false">001  请同学们有序到操场集合，注意安全。
+
+002  请三年级班主任到会议室开会。
+
+003  请值班老师及时检查各班教室。</textarea>
+        <div class="source-foot">
+          <span>支持空格、Tab、逗号、Markdown 标题和编号列表</span>
+          <span id="source-status" class="recognition-state empty">尚未识别</span>
+        </div>
+      </div>
+
+      <div class="pages-panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-step"><b>2</b> 核对识别结果</div>
+            <h2>核对每一页</h2>
+            <p>只需核对屏幕文案，页码不会出现在课堂屏幕上。</p>
+          </div>
+          <button id="add-page-button" class="button" type="button" disabled>＋ 添加一页</button>
+        </div>
+
+        <div id="page-empty" class="panel-empty">等待第一步<br>粘贴内容后点击“智能识别”</div>
+        <div id="page-list" class="page-list" hidden></div>
+      </div>
+    </section>
+
+    <section class="usage-panel" aria-label="场景使用记录">
+      <label for="usage-filter">按使用次数筛选背景</label>
+      <select id="usage-filter"><option value="all">全部</option><option value="0">未使用</option><option value="1">已使用 1 次</option><option value="2">已使用 2 次</option><option value="3">已使用 3 次</option><option value="4+">已使用 4 次及以上</option></select>
+      <span id="usage-summary"></span>
+      <button type="button" id="usage-export" class="button">导出记录</button>
+      <label class="button">导入记录<input id="usage-import" type="file" accept="application/json,.json" style="max-width:180px"></label>
+      <p>次数按背景图片累计，生成文件并提交浏览器下载后计数；保存窗口取消无法检测。预览和换场景不计数，记录保存在当前浏览器。</p>
+      <p id="usage-status" role="status"></p><p id="usage-empty" hidden>没有符合条件的背景，请调整筛选。</p>
+      <div id="usage-scenes"></div>
+    </section>
+    <section class="preview-section">
+      <div class="preview-head">
+        <div>
+          <div class="workflow-label"><span>3</span> 最终排版</div>
+          <h2>大图核对，文字清晰可见</h2>
+          <p>两列预览；图片只显示屏幕文案，页码留在图片外。</p>
+          <span id="preview-status" class="sync-note waiting">等待右侧核对后更新排版</span>
+        </div>
+        <div class="top-actions">
+          <button id="reassign-button" class="button" type="button" disabled>重新分配课堂</button>
+          <button id="download-button" class="button primary" type="button" disabled>下载全部 ZIP</button>
+        </div>
+      </div>
+
+      <div id="preview-empty" class="preview-empty">下方不会直接读取左侧原文<br>只有右侧核对结果可以生成排版</div>
+      <div id="preview-grid" class="preview-grid" hidden></div>
+
+      <p class="prototype-note">图片导出为 1080×1440 PNG；ZIP 包含本批全部图片。使用记录仅保存在当前浏览器，可导出备份。</p>
+    </section>
+  </main>
+  <script type="module">
+    import { USAGE_KEY, eligibleScenes, assignScenes, validateRecord, mergeCounts } from './scene-usage.mjs';
+    import { renderCover, pngBlob, saveBlob, createStoredZip } from './cover-export.mjs';
+    import { sceneCatalog } from '../data/all-scenes.mjs';
+
+    const sourceCopy = document.querySelector("#source-copy");
+    const recognizeButton = document.querySelector("#recognize-button");
+    const clearButton = document.querySelector("#clear-button");
+    const updateLayoutButton = document.querySelector("#update-layout-button");
+    const addPageButton = document.querySelector("#add-page-button");
+    const pageList = document.querySelector("#page-list");
+    const pageEmpty = document.querySelector("#page-empty");
+    const sourceStatus = document.querySelector("#source-status");
+    const recognizedCount = document.querySelector("#recognized-count");
+    const previewStatus = document.querySelector("#preview-status");
+    const previewGrid = document.querySelector("#preview-grid");
+    const previewEmpty = document.querySelector("#preview-empty");
+    const reassignButton = document.querySelector("#reassign-button");
+    const downloadButton = document.querySelector("#download-button");
+
+    let pages = [];
+    let previewPages = [];
+    sceneCatalog.forEach(s => { s.id ||= s.src.split('/').pop().replace('.png',''); });
+    let assignedScenes = [];
+    let busy = false;
+    let counts = {};
+    const filter = document.querySelector('#usage-filter');
+    const usageStatus = document.querySelector('#usage-status');
+    function readCounts() {
+      const raw=localStorage.getItem(USAGE_KEY);
+      return raw ? validateRecord(JSON.parse(raw),sceneCatalog.map(s=>s.id)) : {};
+    }
+    try { counts=readCounts(); } catch { usageStatus.textContent='无法读取本地记录，请先导入有效记录或检查浏览器存储权限。'; }
+    function pool() {return eligibleScenes(sceneCatalog,counts,filter.value);}
+    function usageLabel(id) {return counts[id] ? `已用 ${counts[id]} 次` : '未使用';}
+    function renderUsage() {
+      const available=pool();
+      document.querySelector('#usage-summary').textContent=`符合条件 ${available.length} / ${sceneCatalog.length} 张`;
+      const gallery=document.querySelector('#usage-scenes');gallery.replaceChildren();
+      for(const scene of available) {
+        const card=document.createElement('div');card.className='usage-scene';
+        const img=new Image();img.src=scene.src;img.alt=scene.name;img.loading='lazy';
+        const label=document.createElement('span');label.textContent=`${scene.name} · ${usageLabel(scene.id)}`;
+        card.append(img,label);gallery.append(card);
+      }
+      document.querySelector('#usage-empty').hidden=available.length>0;
+      document.querySelectorAll('[data-usage-id]').forEach(el=>el.textContent=usageLabel(el.dataset.usageId));
+    }
+    function allocate() {
+      assignedScenes=assignScenes(pool(),counts,previewPages.length);
+      renderPreview();
+      if(!pool().length) previewStatus.textContent='没有符合筛选条件的背景，请调整筛选。';
+      else if(pool().length===1 && previewPages.length>1)previewStatus.textContent='当前只有 1 张符合条件的背景，本批会重复使用。';
+      else previewStatus.textContent=previewPages.length ? `已按筛选条件分配 ${previewPages.length} 页背景` : '等待右侧核对后更新排版';
+    }
+    function writeCounts(next) {
+      localStorage.setItem(USAGE_KEY,JSON.stringify({version:1,counts:next}));counts=next;renderUsage();
+    }
+    async function downloadCovers(indices) {
+      if(busy || !indices.length)return;
+      busy=true;
+      const snapshot=indices.map(i=>({scene:assignedScenes[i],text:previewPages[i].screen,index:i}));
+      document.querySelector('main').inert=true;document.querySelector('header')?.setAttribute('inert','');
+      try {
+        // Fail before downloading when storage cannot persist the count.
+        const current=readCounts();localStorage.setItem(USAGE_KEY,JSON.stringify({version:1,counts:current}));
+        const files=[];
+        for(const [i,item] of snapshot.entries()) {
+          if(!item.scene)throw new Error('没有可用场景');
+          previewStatus.textContent=`正在制作 ${i+1}/${snapshot.length}`;
+          const canvas=await renderCover(item.scene,item.text),blob=await pngBlob(canvas);
+          files.push({name:`课堂通知-${String(item.index+1).padStart(2,'0')}-${item.scene.id}.png`,data:new Uint8Array(await blob.arrayBuffer()),blob});
+        }
+        const isZip=indices.length!==1 || indices.zip;
+        const blob=isZip?createStoredZip(files):files[0].blob;
+        saveBlob(blob,isZip?`课堂通知-${files.length}张.zip`:files[0].name);
+        const next=readCounts();for(const item of snapshot)next[item.scene.id]=(next[item.scene.id]||0)+1;
+        writeCounts(next);
+        previewStatus.textContent=`已生成并提交下载，${snapshot.length} 张图片的使用次数已记录。`;
+      } catch(error) {previewStatus.textContent=`操作未完成：${error.message}`;}
+      finally {busy=false;document.querySelector('main').inert=false;document.querySelector('header')?.removeAttribute('inert');}
+    }
+    filter.addEventListener('change',()=>{renderUsage();allocate();});
+    document.querySelector('#usage-export').addEventListener('click',()=>saveBlob(new Blob([JSON.stringify({version:1,counts},null,2)],{type:'application/json'}),'课堂场景使用记录.json'));
+    document.querySelector('#usage-import').addEventListener('change',async event=>{
+      const file=event.target.files[0];if(!file)return;
+      try {const incoming=validateRecord(JSON.parse(await file.text()),sceneCatalog.map(s=>s.id));writeCounts(mergeCounts(readCounts(),incoming));usageStatus.textContent='记录已合并：每张场景保留较大次数，重复导入不会叠加。';}
+      catch(error){usageStatus.textContent=`导入失败：${error.message}`;}
+      event.target.value='';
+    });
+    window.addEventListener('storage',event=>{if(event.key===USAGE_KEY){try{counts=readCounts();renderUsage();}catch{usageStatus.textContent='本地记录无效，请检查导入文件。';}}});
+
+    function splitSourceFields(block, index) {
+      const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+      const heading = lines[0]?.match(/^#{1,6}\s+(.+)$/);
+      if (heading && lines.length > 1) {
+        return {
+          screen: lines.slice(1).join("\n")
+        };
+      }
+
+      const singleLine = lines.join(" ").replace(/^[-*+]\s+/, "");
+      const columns = singleLine.split(/\t+|\s{2,}/).map((part) => part.trim()).filter(Boolean);
+      if (columns.length >= 3 && /^\d{1,3}[.、)]?$/.test(columns[0])) {
+        return { screen: columns.slice(1, -1).join(" ") };
+      }
+      if (columns.length >= 2 && /^\d{1,3}[.、)]?$/.test(columns[0])) {
+        return { screen: columns.slice(1).join(" ") };
+      }
+
+      const numbered = singleLine.match(/^\d{1,3}[.、)]?\s*(.+)$/);
+      return {
+        screen: numbered ? numbered[1] : singleLine
+      };
+    }
+
+    function parseSource(value) {
+      const normalized = value.replace(/\r\n?/g, "\n").trim();
+      if (!normalized) return [];
+      const blocks = normalized.includes("\n\n")
+        ? normalized.split(/\n\s*\n+/)
+        : normalized.split("\n");
+      return blocks
+        .map((block, index) => splitSourceFields(block, index))
+        .filter((page) => page.screen.trim())
+        .slice(0, 20);
+    }
+
+    function setSourceStatus(text, mode) {
+      sourceStatus.textContent = text;
+      sourceStatus.className = `recognition-state ${mode || ""}`.trim();
+    }
+
+    function markPreviewStale(message = "右侧内容已修改，请更新下方排版") {
+      previewStatus.textContent = message;
+      previewStatus.className = "sync-note waiting";
+      updateLayoutButton.disabled = pages.length === 0;
+    }
+
+    function createPageCard(page, index) {
+      const article = document.createElement("article");
+      article.className = "page-item";
+      article.innerHTML = `
+        <div class="page-number">${String(index + 1).padStart(2, "0")}</div>
+        <div class="page-fields">
+          <div class="item-tools">
+            <span>等待核对</span>
+            <div>
+              ${index ? '<button class="merge-page" type="button">并入上一页</button>' : '<button class="split-page" type="button">拆成两页</button>'}
+              <button class="delete-page" type="button">删除</button>
+            </div>
+          </div>
+          <div class="field"><label>屏幕文案</label><textarea class="screen-field" rows="2"></textarea></div>
+        </div>`;
+
+      const screenField = article.querySelector(".screen-field");
+      screenField.value = page.screen;
+
+      screenField.addEventListener("input", () => {
+        pages[index].screen = screenField.value;
+        markPreviewStale();
+      });
+      article.querySelector(".delete-page").addEventListener("click", () => {
+        pages.splice(index, 1);
+        renderPages();
+        markPreviewStale("右侧页数已改变，请更新下方排版");
+      });
+
+      article.querySelector(".merge-page")?.addEventListener("click", () => {
+        pages[index - 1].screen = `${pages[index - 1].screen}\n${pages[index].screen}`.trim();
+        pages.splice(index, 1);
+        renderPages();
+        markPreviewStale("右侧页数已改变，请更新下方排版");
+      });
+
+      article.querySelector(".split-page")?.addEventListener("click", () => {
+        const parts = page.screen.split(/[，。；！？]/).map((part) => part.trim()).filter(Boolean);
+        if (parts.length < 2) {
+          const middle = Math.max(1, Math.floor(page.screen.length / 2));
+          parts.splice(0, parts.length, page.screen.slice(0, middle), page.screen.slice(middle));
+        }
+        const first = parts.slice(0, Math.ceil(parts.length / 2)).join("，");
+        const second = parts.slice(Math.ceil(parts.length / 2)).join("，");
+        pages.splice(index, 1,
+          { screen: first },
+          { screen: second }
+        );
+        renderPages();
+        markPreviewStale("右侧页数已改变，请更新下方排版");
+      });
+      return article;
+    }
+
+    function renderPages() {
+      pageList.replaceChildren();
+      pageEmpty.hidden = pages.length > 0;
+      pageList.hidden = pages.length === 0;
+      pages.forEach((page, index) => pageList.append(createPageCard(page, index)));
+      recognizedCount.textContent = String(pages.length);
+      addPageButton.disabled = pages.length === 0 || pages.length >= 20;
+      updateLayoutButton.disabled = pages.length === 0;
+    }
+
+    function createCoverCard(page, index) {
+      const scene = assignedScenes[index];
+      const article = document.createElement("article");
+      article.className = "cover-card";
+      article.innerHTML = `
+        <div class="cover-stage">
+          <img alt="${scene.name}">
+
+        </div>
+        <div class="cover-caption">
+          <div><strong></strong><span></span></div>
+          <div class="caption-actions"><button type="button">换场景</button><button class="download" type="button">下载 PNG</button></div>
+        </div>`;
+      article.querySelector("img").src = scene.src;
+      const lines=page.screen.split('\n');
+      if(lines.length>4 || page.screen.length>100){
+        const warning=document.createElement('p');warning.textContent='文案较长，请检查文字大小与换行。';warning.style.color='#a96016';article.append(warning);
+      }
+      const stage=article.querySelector('.cover-stage');
+      renderCover(scene,page.screen).then(canvas=>{
+        if(!article.isConnected)return;
+        canvas.style.cssText='width:100%;height:100%;display:block';
+        stage.replaceChildren(canvas);
+      }).catch(()=>{const warning=document.createElement('p');warning.textContent='预览加载失败，请更换场景或重试。';stage.append(warning);});
+      article.querySelector("strong").textContent = `第 ${String(index + 1).padStart(2, "0")} 页`;
+      article.querySelector(".cover-caption span").textContent = scene.name;
+      const badge=document.createElement('b');badge.dataset.usageId=scene.id;badge.textContent=usageLabel(scene.id);
+      article.querySelector('.cover-caption').append(badge);
+      article.querySelector(".caption-actions button").addEventListener("click", () => {
+        const candidates=pool().filter(s=>s.id!==scene.id && s.id!==assignedScenes[index-1]?.id && s.id!==assignedScenes[index+1]?.id);
+        const choice=assignScenes(candidates,counts,1)[0];
+        if(!choice){previewStatus.textContent='没有其他符合筛选且不与相邻图片重复的场景。';return;}
+        assignedScenes[index]=choice;renderPreview();
+      });
+      article.querySelector(".download").addEventListener("click", () => {
+        downloadCovers([index]);
+      });
+      return article;
+    }
+
+    function renderPreview() {
+      previewGrid.replaceChildren();
+      previewEmpty.hidden = assignedScenes.length > 0;
+      previewGrid.hidden = assignedScenes.length === 0;
+      assignedScenes.forEach((scene, index) => previewGrid.append(createCoverCard(previewPages[index], index)));
+      reassignButton.disabled = assignedScenes.length === 0;
+      downloadButton.disabled = assignedScenes.length === 0;
+      downloadButton.textContent = previewPages.length ? `下载全部 ZIP（${previewPages.length}）` : "下载全部 ZIP";
+    }
+
+    sourceCopy.addEventListener("input", () => {
+      setSourceStatus(pages.length ? "原文已修改，请重新识别" : "等待智能识别", "waiting");
+    });
+
+    recognizeButton.addEventListener("click", () => {
+      const recognized = parseSource(sourceCopy.value);
+      if (!recognized.length) {
+        setSourceStatus("没有识别到可用内容", "waiting");
+        return;
+      }
+      pages = recognized;
+      renderPages();
+      setSourceStatus(`已同步到右侧 ${pages.length} 页${pages.length===20 ? "（单批最多 20 页，请检查是否有剩余文案）" : ""}`, "");
+      markPreviewStale("右侧已更新，等待生成下方排版");
+      document.querySelector(".pages-panel").classList.remove("flash");
+      requestAnimationFrame(() => document.querySelector(".pages-panel").classList.add("flash"));
+    });
+
+    updateLayoutButton.addEventListener("click", () => {
+      previewPages = pages.map((page) => ({ ...page }));
+      previewStatus.textContent = `已按右侧顺序同步 ${previewPages.length} 页`;
+      allocate();
+      previewStatus.className = "sync-note";
+      previewGrid.classList.remove("flash");
+      requestAnimationFrame(() => previewGrid.classList.add("flash"));
+      document.querySelector(".preview-section").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    addPageButton.addEventListener("click", () => {
+      if (pages.length >= 20) return;
+      pages.push({ screen: "请输入屏幕文案" });
+      renderPages();
+      markPreviewStale("已添加一页，请核对后更新下方排版");
+      pageList.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+
+    clearButton.addEventListener("click", () => {
+      sourceCopy.value = "";
+      pages = [];
+      previewPages = [];
+      assignedScenes = [];
+      renderPages();
+      renderPreview();
+      setSourceStatus("尚未识别", "empty");
+      previewStatus.textContent = "等待右侧核对后更新排版";
+      previewStatus.className = "sync-note waiting";
+    });
+
+    reassignButton.addEventListener("click", () => {
+      previewStatus.textContent = "已按筛选条件重新分配背景";
+      allocate();
+      previewStatus.className = "sync-note";
+    });
+
+    downloadButton.addEventListener("click", () => {
+      const indices=assignedScenes.map((s,i)=>i);indices.zip=true;downloadCovers(indices);
+    });
+
+    renderUsage();
+    renderPages();
+    renderPreview();
+  </script>
+</body>
+</html>
