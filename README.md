@@ -1,5 +1,7 @@
 # 课堂通知批量制作台
 
+在线使用：[打开课堂通知制作台](https://duuhuang-ai.github.io/classroom-notice-cover/)
+
 这是一个独立的本地工具，不属于小红书商家工具箱。
 
 当前使用的完整双栏页面为 `prototypes/prototype-v03.html`，含 83 张课堂背景。本地服务启动后，打开 <http://127.0.0.1:5189/prototypes/prototype-v03.html>。根目录 `index.html` 自动进入完整双栏页面；早期版本保留在 `legacy.html`。
